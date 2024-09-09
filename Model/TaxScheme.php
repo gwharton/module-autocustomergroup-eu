@@ -1,4 +1,5 @@
 <?php
+
 namespace Gw\AutoCustomerGroupEu\Model;
 
 use GuzzleHttp\ClientFactory;
@@ -7,7 +8,6 @@ use GuzzleHttp\Psr7\Request;
 use Gw\AutoCustomerGroup\Api\Data\TaxIdCheckResponseInterface;
 use Gw\AutoCustomerGroup\Api\Data\TaxIdCheckResponseInterfaceFactory;
 use Gw\AutoCustomerGroup\Api\Data\TaxSchemeInterface;
-use Gw\AutoCustomerGroup\Model\Config\Source\Environment;
 use Magento\Directory\Model\Currency;
 use Magento\Directory\Model\CurrencyFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;

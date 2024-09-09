@@ -1,5 +1,7 @@
 <?php
 
+namespace Gw\AutoCustomerGroupEu\Test\Unit;
+
 use GuzzleHttp\ClientFactory;
 use Gw\AutoCustomerGroup\Model\TaxSchemeHelper;
 use Gw\AutoCustomerGroupEu\Model\TaxScheme;
