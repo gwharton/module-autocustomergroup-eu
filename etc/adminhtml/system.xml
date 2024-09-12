@@ -5,37 +5,10 @@
             <group id="euvat" translate="label" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>EU OSS/IOSS VAT Scheme</label>
                 <comment><![CDATA[
-<div class="autocustomergroup-schemeoverview">
-<p>This Scheme applies to shipments being sent from anywhere in the world to the EU. Note special procedures
-    apply for shipments from Northern Ireland (NI, Part of UK) to the EU.</p>
-<p>As of 1st July 2021, sellers may register for the EU OSS/IOSS scheme in an EU country of their choice, and collect the
-    appropriate EU VAT at the point of sale and remit to the EU.</p>
-<p>The module assumes the following rules :</p>
-<ul>
-    <li><b>Domestic</b> - For shipments within a single EU country, normal EU VAT rules apply.</li>
-    <li><b>Intra-EU B2B</b> - For shipments between different countries within the EU, or from NI to the EU and the buyer presents a validated EU VAT number, then
-        the sale can be zero rated for EU VAT. Zero Rate notice to be included on Invoice.</li>
-    <li><b>Intra-EU B2C</b> - For shipments between different countries within the EU, or from NI to the EU and the buyer does NOT present a validated EU VAT number, then
-        Destination Country VAT should be charged.</li>
-    <li><b>Import B2B</b> - For shipments from outside of the EU to within the EU and the buyer presents a validated EU VAT number, then
-        VAT should not be charged. Reverse Charge notice to be included on Invoice.</li>
-    <li><b>Import Taxed</b> - For shipments from outside of the EU to the EU and the total goods value is equal to or below 150 EUR, then
-        Destination Country VAT should be charged.</li>
-    <li><b>Import Untaxed</b> - For shipments from outside of the EU to the EU and the total goods value is above 150 EUR, then VAT should
-        NOT be charged and instead will be collected at the EU border along with any duties due.</li>
-</ul>
-<p>For the EU OSS/IOSS VAT Scheme, the following applies (This can be confirmed
-    <a href="https://taxation-customs.ec.europa.eu/document/download/7bfb45b8-1f40-48b5-88e0-07960bf7ff9e_en?filename=Customs%20Guidance%20doc%20on%20LVC-Clean-20220915.pdf"
-    target="_blank">here</a> in Section 1.3.1) :</p>
-<ul>
-    <li>Total Goods value is the sum of the sale price of all items sold (including any discounts)</li>
-    <li>When determining whether VAT should be charged (VAT Threshold) Shipping or Insurance Costs are not included in the value of the goods.</li>
-    <li>When determining the amount of VAT to charge the Goods value does include Shipping and Insurance Costs.</li>
-</ul>
-<p>More information on the scheme can be found on the
-    <a href="https://ec.europa.eu/taxation_customs/customs-procedures/customs-formalities-low-value-consignments_en" target="_blank">European Commission Website</a></p>
-<p>If the customer enters a valid format EU VAT number at checkout, the number will be validated with the EU VIES service.</p>
-</div>
+                    <div>
+                        <p>For a detailed description of the configuration options below, please consult the <a href="https://github.com/gwharton/module-autocustomergroup-eu" target="_blank">
+                            EU OSS/IOSS VAT Scheme Addon Module homepage on Github</a>.</p>
+                    </div>
                     ]]></comment>
                 <depends>
                     <field id="autocustomergroup/general/enabled">1</field>
@@ -53,13 +26,6 @@
                 <field id="validate_online" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Validate Online</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>
-                        <![CDATA[
-                        <ul>
-                        <li>Yes : VAT number is checked with the EU VIES Online VAT Number Checking Service.</li>
-                        <li>No : Only the format of the VAT Number is checked.</li>
-                        </ul>
-                        ]]></comment>
                     <depends>
                         <field id="enabled">1</field>
                     </depends>
@@ -71,12 +37,6 @@
                         <field id="validate_online">1</field>
                         <field id="enabled">1</field>
                     </depends>
-                    <comment>
-                        <![CDATA[
-                        Optional. Must be valid EU country, if completed, it will be passed to the VIES with the validation request and a unique
-                        verification code will be returned and stored with the order as proof of validation.
-                        ]]>
-                    </comment>
                 </field>
                 <field id="viesregistrationnumber" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>VIES Registration Number</label>
@@ -84,12 +44,6 @@
                         <field id="validate_online">1</field>
                         <field id="enabled">1</field>
                     </depends>
-                    <comment>
-                        <![CDATA[
-                        Optional. Must be valid EU VAT number, if completed, it will be passed to the VIES with the validation request and a unique
-                        verification code will be returned and stored with the order as proof of validation.
-                        ]]>
-                    </comment>
                 </field>
                 <field id="registrationnumber" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>VAT/Scheme Registration Number</label>
@@ -112,11 +66,6 @@
                 </field>
                 <field id="exchangerate" translate="label" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" canRestore="1">
                     <label>Exchange Rate</label>
-                    <comment>
-                        <![CDATA[
-                        The exchange rate to convert from EUR to Store Base Currency. It is recommended to use the EU InforEuro exchange rates, which can be found on the
-                        <a href="https://ec.europa.eu/info/funding-tenders/how-eu-funding-works/information-contractors-and-beneficiaries/exchange-rate-inforeuro_en" target="_blank">European Comission Website</a>.
-                        ]]></comment>
                     <depends>
                         <field id="usemagentoexchangerate">0</field>
                         <field id="enabled">1</field>
@@ -125,15 +74,13 @@
                 <field id="importthresholdstorecurrency" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1">
                     <label>Import VAT Threshold (Store Base Currency)</label>
                     <frontend_model>EuVatImportThresholdStoreBaseCurrency</frontend_model>
-                    <comment>The order value (ex VAT) above which no VAT should be charged. Calculated as the sum of all line items after discount ex Tax.</comment>
-                    <depends>
+                     <depends>
                         <field id="enabled">1</field>
                     </depends>
                 </field>
                 <field id="domestic" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Customer Group - Domestic</label>
                     <source_model>Gw\AutoCustomerGroup\Model\Config\Source\Group</source_model>
-                    <comment>Merchant Country is within the EU, Item is being shipped to the same country.</comment>
                     <depends>
                         <field id="enabled">1</field>
                     </depends>
@@ -141,7 +88,6 @@
                 <field id="intraeub2b" translate="label" type="select" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Customer Group - Intra-EU B2B</label>
                     <source_model>Gw\AutoCustomerGroup\Model\Config\Source\Group</source_model>
-                    <comment>Merchant Country is within the EU or NI, Item is being shipped to the EU, Merchant Country and Shipping Country are not the same, Validated EU VAT Number Supplied.</comment>
                     <depends>
                         <field id="enabled">1</field>
                     </depends>
@@ -149,7 +95,6 @@
                 <field id="intraeub2c" translate="label" type="select" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Customer Group - Intra EU B2C</label>
                     <source_model>Gw\AutoCustomerGroup\Model\Config\Source\Group</source_model>
-                    <comment>Merchant Country is within the EU or NI, Item is being shipped to the EU, Merchant Country and Shipping Country are not the same, Validated EU VAT Number is NOT Supplied..</comment>
                     <depends>
                         <field id="enabled">1</field>
                     </depends>
@@ -157,7 +102,6 @@
                 <field id="importb2b" translate="label" type="select" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Customer Group - Import B2B</label>
                     <source_model>Gw\AutoCustomerGroup\Model\Config\Source\Group</source_model>
-                    <comment>Merchant Country is not within the EU, Item is being shipped to the EU, Validated EU VAT Number Supplied.</comment>
                     <depends>
                         <field id="enabled">1</field>
                     </depends>
@@ -165,7 +109,6 @@
                 <field id="importtaxed" translate="label" type="select" sortOrder="140" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Customer Group - Import Taxed</label>
                     <source_model>Gw\AutoCustomerGroup\Model\Config\Source\Group</source_model>
-                    <comment>Merchant Country is not within the EU, Item is being shipped to the EU, Goods Value is below or equal to the Import VAT Threshold.</comment>
                     <depends>
                         <field id="enabled">1</field>
                     </depends>
@@ -173,7 +116,6 @@
                 <field id="importuntaxed" translate="label" type="select" sortOrder="150" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Customer Group - Import Untaxed</label>
                     <source_model>Gw\AutoCustomerGroup\Model\Config\Source\Group</source_model>
-                    <comment>Merchant Country is not within the EU, Item is being shipped to the EU, Goods Value is above the Import VAT Threshold.</comment>
                     <depends>
                         <field id="enabled">1</field>
                     </depends>
