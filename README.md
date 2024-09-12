@@ -46,7 +46,7 @@
 <li><b>Offline Validation</b> - A simple format validation is performed.</li>
 <li><b>Online Validation</b> - In addition to the offline checks above, an online validation check is performed with the EU VIES service.</li>
 </ul>
-<p>When the module submits requests to the VIES service for VAT number validation, it can do so in two ways.</p>
+<p>When the module submits requests to the VIES service for VAT number validation, it can do so in two ways, depending on whether VIES Registration Country and VIES Registration number is set or left blank.</p>
 <ul>
 <li>The first method is anonymous, and a basic response to the validation request is given. If you leave these two fields blank, the module will use this method.</li>
 <li>The second method provides more details and includes a "proof of validation" identifier which the module will store with the VAT validation details in the Magento database after verification. You can use this as proof that you checked the status. The only issue is that you have to provide a VAT registration country and VAT registration number of a business registered for VAT in the EU. Providing your IOSS details will not work. It is up to you, if you want to enable this feature, to locate suitable details to enter here. The EU will log the request with those company details, and no doubt, the IP address of your server.</li>
