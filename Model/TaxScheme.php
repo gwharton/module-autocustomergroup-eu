@@ -116,9 +116,9 @@ class TaxScheme  implements TaxSchemeInterface
     /**
      * Get customer group based on Validation Result and Country of customer
      * @param string $customerCountryCode
-     * @param string|null $customerPostCode
      * @param bool $taxIdValidated
      * @param float $orderValue
+     * @param string|null $customerPostCode
      * @param int|null $storeId
      * @return int|null
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
@@ -128,9 +128,9 @@ class TaxScheme  implements TaxSchemeInterface
      */
     public function getCustomerGroup(
         string $customerCountryCode,
-        ?string $customerPostCode,
         bool $taxIdValidated,
         float $orderValue,
+        ?string $customerPostCode,
         ?int $storeId
     ): ?int {
         $merchantCountry = $this->scopeConfig->getValue(
@@ -250,12 +250,12 @@ class TaxScheme  implements TaxSchemeInterface
      * Peform validation of the VAT Number, returning a gatewayResponse object
      *
      * @param string $countryCode
-     * @param string|null $taxId
+     * @param string $taxId
      * @return TaxIdCheckResponseInterface
      */
     public function checkTaxId(
         string $countryCode,
-        ?string $taxId
+        string $taxId
     ): TaxIdCheckResponseInterface {
         $taxIdCheckResponse = $this->ticrFactory->create();
 
@@ -276,15 +276,7 @@ class TaxScheme  implements TaxSchemeInterface
 
         $taxIdCheckResponse = $this->validateFormat($taxIdCheckResponse, $taxId, $countryCode);
 
-        if ($taxIdCheckResponse->getIsValid() && $this->scopeConfig->isSetFlag(
-                "autocustomergroup/" . self::CODE . "/validate_online",
-                ScopeInterface::SCOPE_STORE
-            )) {
-            $taxIdCheckResponse = $this->validateOnline($taxIdCheckResponse, $taxId, $countryCode);
-        }
-
         return $taxIdCheckResponse;
-
     }
 
     /**
@@ -403,89 +395,6 @@ class TaxScheme  implements TaxSchemeInterface
             $taxIdCheckResponse->setRequestMessage(__('Unsupported country.'));
             $taxIdCheckResponse->setIsValid(false);
             $taxIdCheckResponse->setRequestSuccess(false);
-        }
-        return $taxIdCheckResponse;
-    }
-
-    /**
-     * Perform online validation of the Tax Identifier
-     *
-     * @param $taxIdCheckResponse
-     * @param $taxId
-     * @return TaxIdCheckResponseInterface
-     */
-    private function validateOnline($taxIdCheckResponse, $taxId, $countryCode): TaxIdCheckResponseInterface
-    {
-        try {
-            $body = [];
-            $body['countryCode'] = $countryCode;
-            $body['vatNumber'] = $taxId;
-
-            $requesterCountryCode = $this->scopeConfig->getValue(
-                "autocustomergroup/" . self::CODE . "/viesregistrationcountry",
-                ScopeInterface::SCOPE_STORE
-            );
-            $requesterVatNumber = $this->scopeConfig->getValue(
-                "autocustomergroup/" . self::CODE . "/viesregistrationnumber",
-                ScopeInterface::SCOPE_STORE
-            );
-
-            if (!empty($requesterCountryCode) && !empty($requesterVatNumber)) {
-                $requesterVatNumber = str_replace(
-                    [' ', '-', $this->getCountryCodeForVatNumber($requesterCountryCode)],
-                    ['', '', ''],
-                    $requesterVatNumber
-                );
-                $body['requesterMemberStateCode'] = $requesterCountryCode;
-                $body['requesterNumber'] = $requesterVatNumber;
-            }
-
-            $client = $this->clientFactory->create();
-            $response = $client->send(
-                new Request(
-                    "POST",
-                    "https://ec.europa.eu/taxation_customs/vies/rest-api/check-vat-number",
-                    [
-                        'Content-Type' => "application/json",
-                        'Accept' => "application/json"
-                    ],
-                    $this->serializer->serialize($body)
-                )
-            );
-            $responseBody = $response->getBody();
-            $vatRegistration = $this->serializer->unserialize($responseBody->getContents());
-            if (isset($vatRegistration['actionSucceeded']) && $vatRegistration['actionSucceeded'] == false) {
-                $taxIdCheckResponse->setIsValid(false);
-                $taxIdCheckResponse->setRequestSuccess(false);
-                $taxIdCheckResponse->setRequestMessage(__('There was an error checking the VAT number.'));
-            } else {
-                $taxIdCheckResponse->setIsValid($vatRegistration['valid']);
-                $taxIdCheckResponse->setRequestSuccess(true);
-                $taxIdCheckResponse->setRequestDate($vatRegistration['requestDate']);
-                $taxIdCheckResponse->setRequestIdentifier($vatRegistration['requestIdentifier']);
-                if ($taxIdCheckResponse->getIsValid()) {
-                    $taxIdCheckResponse->setRequestMessage(__('VAT Number validated with VIES.'));
-                } else {
-                    $taxIdCheckResponse->setRequestMessage(__('Please enter a valid VAT number including country code.'));
-                }
-            }
-        } catch (BadResponseException $e) {
-            switch ($e->getCode()) {
-                case 404:
-                    $taxIdCheckResponse->setIsValid(false);
-                    $taxIdCheckResponse->setRequestSuccess(true);
-                    $taxIdCheckResponse->setRequestMessage(__('Please enter a valid VAT number.'));
-                    break;
-                default:
-                    $taxIdCheckResponse->setIsValid(false);
-                    $taxIdCheckResponse->setRequestSuccess(false);
-                    $taxIdCheckResponse->setRequestMessage(__('There was an error checking the VAT number.'));
-                    $this->logger->error(
-                        "Gw/AutoCustomerGroup/Model/TaxSchemes/EuVat::checkTaxId() : EuVat Error received from " .
-                        "VIES. " . $e->getCode()
-                    );
-                    break;
-            }
         }
         return $taxIdCheckResponse;
     }

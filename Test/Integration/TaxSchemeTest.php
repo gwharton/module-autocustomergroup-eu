@@ -184,9 +184,9 @@ class TaxSchemeTest extends TestCase
         );
         $result = $this->taxScheme->getCustomerGroup(
             $customerCountryCode,
-            $customerPostCode,
             $taxIdValidated,
             $orderValue,
+            $customerPostCode,
             $storeId
         );
         $this->assertEquals($expectedGroup, $result);
@@ -242,12 +242,9 @@ class TaxSchemeTest extends TestCase
     }
 
     /**
-     * @magentoConfigFixture current_store autocustomergroup/euvat/registrationnumber IE8256796U
-     * @magentoConfigFixture current_store autocustomergroup/euvat/environment sandbox
-     * @magentoConfigFixture current_store autocustomergroup/euvat/validate_online 1
-     * @dataProvider checkTaxIdDataProviderOnline
+     * @dataProvider checkTaxIdDataProvider
      */
-    public function testCheckTaxIdOnline(
+    public function testCheckTaxId(
         $countryCode,
         $taxId,
         $isValid
@@ -262,48 +259,7 @@ class TaxSchemeTest extends TestCase
     /**
      * @return array
      */
-    public function checkTaxIdDataProviderOnline(): array
-    {
-        //Country code
-        //Tax Id
-        //IsValid
-        return [
-            ['DE', '',                  false],
-            ['PO', null,                false],
-            ['NL', '810433941B01',      true], // Valid VAT
-            ['IE', 'IE8256796U',        true], // Valid VAT
-            ['IE', 'IE3206488LH',       true], // Valid VAT
-            ['BE', 'reghewrhwh',        false],
-            ['NO', '43643634',          false],
-            ['NO', '3y534673333y',      false],
-            ['NO', 'AB6564764586587',   false],
-            ['US', 'IE8256796U',        false], // Unsupported Country, despite valid VAT Number
-            ['PO', 'th',                false],
-            ['NO', '786176152',         false], // Unsupported Country
-        ];
-    }
-
-    /**
-     * @magentoConfigFixture current_store autocustomergroup/euvat/registrationnumber IE8256796U
-     * @magentoConfigFixture current_store autocustomergroup/euvat/environment sandbox
-     * @dataProvider checkTaxIdDataProviderOffline
-     */
-    public function testCheckTaxIdOffline(
-        $countryCode,
-        $taxId,
-        $isValid
-    ): void {
-        $result = $this->taxScheme->checkTaxId(
-            $countryCode,
-            $taxId
-        );
-        $this->assertEquals($isValid, $result->getIsValid());
-    }
-
-    /**
-     * @return array
-     */
-    public function checkTaxIdDataProviderOffline(): array
+    public function checkTaxIdDataProvider(): array
     {
         //Country code
         //Tax Id

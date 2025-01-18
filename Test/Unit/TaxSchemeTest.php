@@ -3,7 +3,6 @@
 namespace Gw\AutoCustomerGroupEu\Test\Unit;
 
 use GuzzleHttp\ClientFactory;
-use Gw\AutoCustomerGroup\Model\TaxSchemeHelper;
 use Gw\AutoCustomerGroupEu\Model\TaxScheme;
 use Gw\AutoCustomerGroup\Api\Data\TaxIdCheckResponseInterfaceFactory;
 use Magento\Directory\Model\CurrencyFactory;
@@ -56,11 +55,6 @@ class TaxSchemeTest extends TestCase
      */
     private $jsonMock;
 
-    /**
-     * @var TaxSchemeHelper|MockObject
-     */
-    private $helperMock;
-
     protected function setUp(): void
     {
         $this->scopeConfigMock = $this->getMockBuilder(ScopeConfigInterface::class)
@@ -91,10 +85,6 @@ class TaxSchemeTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->helperMock = $this->getMockBuilder(TaxSchemeHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->model = new TaxScheme(
             $this->scopeConfigMock,
             $this->loggerMock,
@@ -102,8 +92,7 @@ class TaxSchemeTest extends TestCase
             $this->currencyFactoryMock,
             $this->taxIdCheckResponseInterfaceFactoryMock,
             $this->clientFactoryMock,
-            $this->jsonMock,
-            $this->helperMock
+            $this->jsonMock
         );
     }
 
