@@ -2,28 +2,20 @@
 
 namespace Gw\AutoCustomerGroupEu\Model;
 
-use GuzzleHttp\ClientFactory;
-use GuzzleHttp\Exception\BadResponseException;
-use GuzzleHttp\Psr7\Request;
+use Exception;
 use Gw\AutoCustomerGroup\Api\Data\TaxIdCheckResponseInterface;
 use Gw\AutoCustomerGroup\Api\Data\TaxIdCheckResponseInterfaceFactory;
 use Gw\AutoCustomerGroup\Api\Data\TaxSchemeInterface;
+use Gw\AutoCustomerGroupEu\SDK\Dto\CheckVATNumberRequest;
+use Gw\AutoCustomerGroupEu\SDK\VIESConnector;
 use Magento\Directory\Model\Currency;
 use Magento\Directory\Model\CurrencyFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Quote\Model\Quote;
 use Magento\Store\Model\Information as StoreInformation;
 use Magento\Store\Model\ScopeInterface;
-use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
 
-/**
- * Real EU VAT numbers (as of 11/07/2024)
- * NL - 810433941B01 - COOLBLUE B.V. - VALID
- * IE - IE8256796U - MICROSOFT IRELAND OPERATIONS LIMITED - VALID
- * IE - IE3206488LH - STRIPE PAYMENTS EUROPE LIMITED - VALID
- */
 class TaxScheme  implements TaxSchemeInterface
 {
     const CODE = "euvat";
@@ -32,19 +24,9 @@ class TaxScheme  implements TaxSchemeInterface
         'IT','LV','LT','LU','MT','MC','NL','PL','PT','RO','SK','SI','ES','SE'];
 
     /**
-     * @var ClientFactory
-     */
-    private $clientFactory;
-
-    /**
-     * @var Json
-     */
-    private $serializer;
-
-    /**
      * @var TaxIdCheckResponseInterfaceFactory
      */
-    protected $ticrFactory;
+    private $ticrFactory;
 
     /**
      * @var ScopeConfigInterface
@@ -54,43 +36,37 @@ class TaxScheme  implements TaxSchemeInterface
     /**
      * @var LoggerInterface
      */
-    protected $logger;
-
-    /**
-     * @var StoreManagerInterface
-     */
-    protected $storeManager;
+    private $logger;
 
     /**
      * @var CurrencyFactory
      */
-    public $currencyFactory;
+    private $currencyFactory;
+
+    /**
+     * @var VIESConnector
+     */
+    private $viesConnector;
 
     /**
      * @param ScopeConfigInterface $scopeConfig
      * @param LoggerInterface $logger
-     * @param StoreManagerInterface $storeManager
      * @param CurrencyFactory $currencyFactory
      * @param TaxIdCheckResponseInterfaceFactory $ticrFactory
-     * @param ClientFactory $clientFactory
-     * @param Json $serializer
+     * @param VIESConnector $viesConnector
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         LoggerInterface $logger,
-        StoreManagerInterface $storeManager,
         CurrencyFactory $currencyFactory,
         TaxIdCheckResponseInterfaceFactory $ticrFactory,
-        ClientFactory $clientFactory,
-        Json $serializer
+        VIESConnector $viesConnector
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->logger = $logger;
-        $this->storeManager = $storeManager;
         $this->currencyFactory = $currencyFactory;
         $this->ticrFactory = $ticrFactory;
-        $this->clientFactory = $clientFactory;
-        $this->serializer = $serializer;
+        $this->viesConnector = $viesConnector;
     }
 
     /**
@@ -276,6 +252,13 @@ class TaxScheme  implements TaxSchemeInterface
 
         $taxIdCheckResponse = $this->validateFormat($taxIdCheckResponse, $taxId, $countryCode);
 
+        if ($taxIdCheckResponse->getIsValid() && $this->scopeConfig->isSetFlag(
+                "autocustomergroup/" . self::CODE . "/validate_online",
+                ScopeInterface::SCOPE_STORE
+            )) {
+            $taxIdCheckResponse = $this->validateOnline($taxIdCheckResponse, $taxId, $countryCode);
+        }
+
         return $taxIdCheckResponse;
     }
 
@@ -395,6 +378,82 @@ class TaxScheme  implements TaxSchemeInterface
             $taxIdCheckResponse->setRequestMessage(__('Unsupported country.'));
             $taxIdCheckResponse->setIsValid(false);
             $taxIdCheckResponse->setRequestSuccess(false);
+        }
+        return $taxIdCheckResponse;
+    }
+
+    /**
+     * Perform online validation of the Tax Identifier
+     *
+     * @param $taxIdCheckResponse
+     * @param $taxId
+     * @return TaxIdCheckResponseInterface
+     */
+    private function validateOnline($taxIdCheckResponse, $taxId, $countryCode): TaxIdCheckResponseInterface
+    {
+        try {
+            $requesterCountryCode = $this->scopeConfig->getValue(
+                "autocustomergroup/" . self::CODE . "/viesregistrationcountry",
+                ScopeInterface::SCOPE_STORE
+            );
+            $requesterVatNumber = $this->scopeConfig->getValue(
+                "autocustomergroup/" . self::CODE . "/viesregistrationnumber",
+                ScopeInterface::SCOPE_STORE
+            );
+            if (!empty($requesterCountryCode) && !empty($requesterVatNumber)) {
+                $requesterVatNumber = str_replace(
+                    [' ', '-', $this->getCountryCodeForVatNumber($requesterCountryCode)],
+                    ['', '', ''],
+                    $requesterVatNumber
+                );
+            }
+            $requestDto = new CheckVATNumberRequest(
+                $countryCode,
+                $taxId,
+                $requesterCountryCode,
+                $requesterVatNumber
+            );
+            $response = $this->viesConnector->checkVATNumber($requestDto);
+            $responseDto = $response->dto();
+            if (!$response->failed()) {
+                $taxIdCheckResponse->setIsValid($responseDto->valid);
+                $taxIdCheckResponse->setRequestSuccess(true);
+                $taxIdCheckResponse->setRequestDate($responseDto->requestDate);
+                if ($responseDto->requestIdentifier && strlen($responseDto->requestIdentifier) > 0) {
+                    $taxIdCheckResponse->setRequestIdentifier($responseDto->requestIdentifier);
+                }
+                if ($taxIdCheckResponse->getIsValid()) {
+                    $taxIdCheckResponse->setRequestMessage(__('VAT Number validated with VIES.'));
+                } else {
+                    $taxIdCheckResponse->setRequestMessage(
+                        __('Please enter a valid VAT number including country code.')
+                    );
+                }
+            } else {
+                $taxIdCheckResponse->setIsValid(false);
+                $taxIdCheckResponse->setRequestSuccess(false);
+                $taxIdCheckResponse->setRequestMessage(__('There was an error checking the VAT number.'));
+                $errors = [];
+                foreach ($responseDto->errorWrappers as $error) {
+                    $errors[] = $error->error . " - " . $error->message;
+                }
+                $this->logger->error(
+                    "Gw/AutoCustomerGroupEu/Model/TaxScheme::validateOnline() : Error received from VIES.",
+                    [
+                        'errors' => $errors
+                    ]
+                );
+            }
+        } catch (Exception $e) {
+            $taxIdCheckResponse->setRequestSuccess(false);
+            $taxIdCheckResponse->setIsValid(false);
+            $taxIdCheckResponse->setRequestMessage(__('A system error has occurred.'));
+            $this->logger->critical(
+                "Gw/AutoCustomerGroupEu/Model/TaxScheme::validateOnline() : Exception",
+                [
+                    'message' => $e->getMessage()
+                ]
+            );
         }
         return $taxIdCheckResponse;
     }

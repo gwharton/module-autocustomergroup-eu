@@ -5,6 +5,9 @@
             <euvat>
                 <enabled>0</enabled>
                 <frontendprompt>EU VAT Registered Businesses, please enter your EU VAT Number (including Country Code), so we can apply the correct rate of VAT to your order.</frontendprompt>
+                <validate_online>0</validate_online>
+                <viesregistrationcountry></viesregistrationcountry>
+                <viesregistrationnumber></viesregistrationnumber>
                 <registrationnumber></registrationnumber>
                 <importthreshold>150</importthreshold>
                 <usemagentoexchangerate>1</usemagentoexchangerate>

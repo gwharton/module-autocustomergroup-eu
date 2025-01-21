@@ -23,6 +23,28 @@
                         <field id="enabled">1</field>
                     </depends>
                 </field>
+                <field id="validate_online" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Validate Online</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="viesregistrationcountry" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>VIES Registration Country</label>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                    <depends>
+                        <field id="validate_online">1</field>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="viesregistrationnumber" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>VIES Registration Number</label>
+                    <depends>
+                        <field id="validate_online">1</field>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
                 <field id="registrationnumber" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>VAT/Scheme Registration Number</label>
                     <depends>

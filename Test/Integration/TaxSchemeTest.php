@@ -242,9 +242,12 @@ class TaxSchemeTest extends TestCase
     }
 
     /**
-     * @dataProvider checkTaxIdDataProvider
+     * @magentoConfigFixture current_store autocustomergroup/euvat/viesregistrationcountry IE
+     * @magentoConfigFixture current_store autocustomergroup/euvat/viesregistrationnumber IE8256796U
+     * @magentoConfigFixture current_store autocustomergroup/euvat/validate_online 1
+     * @dataProvider checkTaxIdDataProviderOnline
      */
-    public function testCheckTaxId(
+    public function testCheckTaxIdOnline(
         $countryCode,
         $taxId,
         $isValid
@@ -259,7 +262,46 @@ class TaxSchemeTest extends TestCase
     /**
      * @return array
      */
-    public function checkTaxIdDataProvider(): array
+    public function checkTaxIdDataProviderOnline(): array
+    {
+        //Country code
+        //Tax Id
+        //IsValid
+        return [
+            ['DE', '',                  false],
+            ['NL', '810433941B01',      true], // COOLBLUE B.V. - VALID 21/01/2025
+            ['IE', 'IE8256796U',        true], // MICROSOFT IRELAND OPERATIONS LIMITED - VALID 21/01/2025
+            ['IE', 'IE3206488LH',       true], // STRIPE PAYMENTS EUROPE LIMITED - VALID 21/01/2025
+            ['IE', 'IE6388047V',        true], // GOOGLE - VALID 21/01/2025
+            ['BE', 'reghewrhwh',        false],
+            ['NO', '43643634',          false],
+            ['NO', '3y534673333y',      false],
+            ['NO', 'AB6564764586587',   false],
+            ['US', 'IE8256796U',        false], // Unsupported Country, despite valid VAT Number
+            ['PO', 'th',                false],
+            ['NO', '786176152',         false], // Unsupported Country
+        ];
+    }
+
+    /**
+     * @dataProvider checkTaxIdDataProviderOffline
+     */
+    public function testCheckTaxIdOffline(
+        $countryCode,
+        $taxId,
+        $isValid
+    ): void {
+        $result = $this->taxScheme->checkTaxId(
+            $countryCode,
+            $taxId
+        );
+        $this->assertEquals($isValid, $result->getIsValid());
+    }
+
+    /**
+     * @return array
+     */
+    public function checkTaxIdDataProviderOffline(): array
     {
         //Country code
         //Tax Id
