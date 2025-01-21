@@ -3,7 +3,6 @@
     "license": "OSL-3.0",
     "type": "magento2-module",
     "require": {
-        "guzzlehttp/guzzle": "*",
         "gwharton/module-autocustomergroup": "*",
         "magento/framework": "*",
         "magento/module-catalog": "*",
@@ -11,7 +10,10 @@
         "magento/module-quote": "*",
         "magento/module-store": "*",
         "psr/log": "*",
-        "ext-pcre": "*"
+        "ext-pcre": "*",
+        "netresearch/jsonmapper": "*",
+        "saloonphp/saloon": "*",
+        "ext-json": "*"
     },
     "config": {
         "sort-packages": true

@@ -1,9 +1,7 @@
 <?php
 namespace Gw\AutoCustomerGroupEu\SDK\Responses;
 
-use Gw\DHL\SDK\Base\Responses\BaseResponse;
-
-final class ErrorResponse extends BaseResponse
+final class ErrorResponse
 {
     /**
      * @param bool $actionSucceed
