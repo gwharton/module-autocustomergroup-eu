@@ -2,13 +2,11 @@
 
 namespace Gw\AutoCustomerGroupEu\Test\Unit;
 
-use GuzzleHttp\ClientFactory;
 use Gw\AutoCustomerGroupEu\Model\TaxScheme;
 use Gw\AutoCustomerGroup\Api\Data\TaxIdCheckResponseInterfaceFactory;
+use Gw\AutoCustomerGroupEu\SDK\VIESConnector;
 use Magento\Directory\Model\CurrencyFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\Serialize\Serializer\Json;
-use Magento\Store\Model\StoreManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -31,11 +29,6 @@ class TaxSchemeTest extends TestCase
     private $loggerMock;
 
     /**
-     * @var StoreManagerInterface|MockObject
-     */
-    private $storeManagerMock;
-
-    /**
      * @var CurrencyFactory|MockObject
      */
     private $currencyFactoryMock;
@@ -46,14 +39,9 @@ class TaxSchemeTest extends TestCase
     private $taxIdCheckResponseInterfaceFactoryMock;
 
     /**
-     * @var ClientFactory|MockObject
+     * @var VIESConnector|MockObject
      */
-    private $clientFactoryMock;
-
-    /**
-     * @var Json|MockObject
-     */
-    private $jsonMock;
+    private $viesConnectorMock;
 
     protected function setUp(): void
     {
@@ -65,10 +53,6 @@ class TaxSchemeTest extends TestCase
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
 
-        $this->storeManagerMock = $this->getMockBuilder(StoreManagerInterface::class)
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-
         $this->currencyFactoryMock = $this->getMockBuilder(CurrencyFactory::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -77,22 +61,16 @@ class TaxSchemeTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->clientFactoryMock = $this->getMockBuilder(ClientFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->jsonMock = $this->getMockBuilder(Json::class)
+        $this->viesConnectorMock = $this->getMockBuilder(VIESConnector::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->model = new TaxScheme(
             $this->scopeConfigMock,
             $this->loggerMock,
-            $this->storeManagerMock,
             $this->currencyFactoryMock,
             $this->taxIdCheckResponseInterfaceFactoryMock,
-            $this->clientFactoryMock,
-            $this->jsonMock
+            $this->viesConnectorMock
         );
     }
 

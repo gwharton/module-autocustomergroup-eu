@@ -1,7 +1,7 @@
 <?php
 namespace Gw\AutoCustomerGroupEu\SDK\Dto;
 
-final class CheckVATNumberRequest
+class CheckVATNumberRequest
 {
     /**
      * @param string $countryCode

@@ -1,7 +1,7 @@
 <?php
-namespace Gw\AutoCustomerGroupEu\SDK\Responses;
+namespace Gw\AutoCustomerGroupEu\SDK\Dto;
 
-final class ErrorResponse
+class ErrorResponse
 {
     /**
      * @param bool $actionSucceed

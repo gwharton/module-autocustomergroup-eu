@@ -1,13 +1,8 @@
 <?php
-namespace Gw\AutoCustomerGroupEu\SDK\Responses;
+namespace Gw\AutoCustomerGroupEu\SDK\Dto;
 
-use Saloon\Contracts\DataObjects\WithResponse;
-use Saloon\Traits\Responses\HasResponse;
-
-final class CheckVATNumberResponse implements WithResponse
+class CheckVATNumberResponse
 {
-    use HasResponse;
-
     /**
      * @param string $countryCode
      * @param string $vatNumber

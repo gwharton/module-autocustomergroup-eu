@@ -3,8 +3,8 @@ namespace Gw\AutoCustomerGroupEu\SDK\Requests;
 
 use Exception;
 use Gw\AutoCustomerGroupEu\SDK\Dto\CheckVATNumberRequest as CheckVATNumberRequestDto;
-use Gw\AutoCustomerGroupEu\SDK\Responses\CheckVATNumberResponse;
-use Gw\AutoCustomerGroupEu\SDK\Responses\ErrorResponse;
+use Gw\AutoCustomerGroupEu\SDK\Dto\CheckVATNumberResponse;
+use Gw\AutoCustomerGroupEu\SDK\Dto\ErrorResponse;
 use JsonMapper;
 use Saloon\Contracts\Body\HasBody;
 use Saloon\Enums\Method;

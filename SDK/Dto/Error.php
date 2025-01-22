@@ -1,7 +1,7 @@
 <?php
 namespace Gw\AutoCustomerGroupEu\SDK\Dto;
 
-final class Error
+class Error
 {
     /**
      * @param string $error
