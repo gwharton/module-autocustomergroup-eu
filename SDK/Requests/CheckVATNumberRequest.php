@@ -18,10 +18,10 @@ class CheckVATNumberRequest extends BaseRequest implements HasBody
     protected Method $method = Method::POST;
 
     /**
-     * @param \Gw\AutoCustomerGroupEu\SDK\Dto\CheckVATNumberRequest $checkVATNumberRequest
+     * @param CheckVATNumberRequestDto $checkVATNumberRequestDto
      */
     public function __construct(
-        public CheckVATNumberRequestDto $checkVATNumberRequest
+        public CheckVATNumberRequestDto $checkVATNumberRequestDto
     ) {}
 
     public function resolveEndpoint(): string
@@ -31,7 +31,7 @@ class CheckVATNumberRequest extends BaseRequest implements HasBody
 
     public function defaultBody(): array
     {
-        return $this->toArray($this->checkVATNumberRequest);
+        return $this->toArray($this->checkVATNumberRequestDto);
     }
 
     public function createDtoFromResponse(Response $response): CheckVATNumberResponse|ErrorResponse
