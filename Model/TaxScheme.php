@@ -416,18 +416,38 @@ class TaxScheme  implements TaxSchemeInterface
             $response = $this->viesConnector->checkVATNumber($requestDto);
             $responseDto = $response->dto();
             if (!$response->failed()) {
-                $taxIdCheckResponse->setIsValid($responseDto->valid);
-                $taxIdCheckResponse->setRequestSuccess(true);
-                $taxIdCheckResponse->setRequestDate($responseDto->requestDate);
-                if ($responseDto->requestIdentifier && strlen($responseDto->requestIdentifier) > 0) {
-                    $taxIdCheckResponse->setRequestIdentifier($responseDto->requestIdentifier);
-                }
-                if ($taxIdCheckResponse->getIsValid()) {
-                    $taxIdCheckResponse->setRequestMessage(__('VAT Number validated with VIES.'));
-                } else {
-                    $taxIdCheckResponse->setRequestMessage(
-                        __('Please enter a valid VAT number including country code.')
+                if ($responseDto->actionSucceed === false) {
+                    $taxIdCheckResponse->setIsValid(false);
+                    $taxIdCheckResponse->setRequestSuccess(false);
+                    $taxIdCheckResponse->setRequestMessage(__('There was an error checking the VAT number.'));
+                    $errors = [];
+                    foreach ($responseDto->errorWrappers as $error) {
+                        $errorMsg = $error->error;
+                        if (isset($error->message)) {
+                            $errorMsg .= " - " . $error->message;
+                        }
+                        $errors[] = $errorMsg;
+                    }
+                    $this->logger->error(
+                        "Gw/AutoCustomerGroupEu/Model/TaxScheme::validateOnline() : Error received from VIES.",
+                        [
+                            'errors' => $errors
+                        ]
                     );
+                } else {
+                    $taxIdCheckResponse->setIsValid($responseDto->valid);
+                    $taxIdCheckResponse->setRequestSuccess(true);
+                    $taxIdCheckResponse->setRequestDate($responseDto->requestDate);
+                    if ($responseDto->requestIdentifier && strlen($responseDto->requestIdentifier) > 0) {
+                        $taxIdCheckResponse->setRequestIdentifier($responseDto->requestIdentifier);
+                    }
+                    if ($taxIdCheckResponse->getIsValid()) {
+                        $taxIdCheckResponse->setRequestMessage(__('VAT Number validated with VIES.'));
+                    } else {
+                        $taxIdCheckResponse->setRequestMessage(
+                            __('Please enter a valid VAT number including country code.')
+                        );
+                    }
                 }
             } else {
                 $taxIdCheckResponse->setIsValid(false);
@@ -435,7 +455,11 @@ class TaxScheme  implements TaxSchemeInterface
                 $taxIdCheckResponse->setRequestMessage(__('There was an error checking the VAT number.'));
                 $errors = [];
                 foreach ($responseDto->errorWrappers as $error) {
-                    $errors[] = $error->error . " - " . $error->message;
+                    $errorMsg = $error->error;
+                    if (isset($error->message)) {
+                        $errorMsg .= " - " . $error->message;
+                    }
+                    $errors[] = $errorMsg;
                 }
                 $this->logger->error(
                     "Gw/AutoCustomerGroupEu/Model/TaxScheme::validateOnline() : Error received from VIES.",

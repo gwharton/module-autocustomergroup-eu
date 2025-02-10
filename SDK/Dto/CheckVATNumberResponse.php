@@ -4,10 +4,10 @@ namespace Gw\AutoCustomerGroupEu\SDK\Dto;
 class CheckVATNumberResponse
 {
     /**
-     * @param string $countryCode
-     * @param string $vatNumber
-     * @param string $requestDate
-     * @param bool $valid
+     * @param string|null $countryCode
+     * @param string|null $vatNumber
+     * @param string|null $requestDate
+     * @param bool|null $valid
      * @param string|null $requestIdentifier
      * @param string|null $name
      * @param string|null $address
@@ -20,12 +20,14 @@ class CheckVATNumberResponse
      * @param string|null $traderStreetMatch
      * @param string|null $traderPostalCodeMatch
      * @param string|null $traderCityMatch
+     * @param bool|null $actionSucceed
+     * @param \Gw\AutoCustomerGroupEu\SDK\Dto\Error[] $errorWrappers
      */
     public function __construct(
-        public string $countryCode,
-        public string $vatNumber,
-        public string $requestDate,
-        public bool $valid,
+        public ?string $countryCode = null,
+        public ?string $vatNumber = null,
+        public ?string $requestDate = null,
+        public ?bool $valid = null,
         public ?string $requestIdentifier = null,
         public ?string $name = null,
         public ?string $address = null,
@@ -37,6 +39,8 @@ class CheckVATNumberResponse
         public ?string $traderNameMatch = null,
         public ?string $traderStreetMatch = null,
         public ?string $traderPostalCodeMatch = null,
-        public ?string $traderCityMatch = null
+        public ?string $traderCityMatch = null,
+        public ?bool $actionSucceed = null,
+        public ?array $errorWrappers = []
     ) {}
 }

@@ -5,10 +5,10 @@ class ErrorResponse
 {
     /**
      * @param bool $actionSucceed
-     * @param \Gw\AutoCustomerGroupEu\SDK\Dto\Error[] $errors
+     * @param \Gw\AutoCustomerGroupEu\SDK\Dto\Error[] $errorWrappers
      */
     public function __construct(
         public bool $actionSucceed,
-        public array $errors
+        public array $errorWrappers
     ) {}
 }
