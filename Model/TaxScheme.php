@@ -116,8 +116,7 @@ class TaxScheme  implements TaxSchemeInterface
         );
         if (empty($merchantCountry)) {
             $this->logger->critical(
-                "Gw/AutoCustomerGroupEu/Model/TaxScheme::getCustomerGroup() : " .
-                "Merchant country not set."
+                __METHOD__ . " Merchant country not set"
             );
             return null;
         }
@@ -429,7 +428,7 @@ class TaxScheme  implements TaxSchemeInterface
                         $errors[] = $errorMsg;
                     }
                     $this->logger->error(
-                        "Gw/AutoCustomerGroupEu/Model/TaxScheme::validateOnline() : Error received from VIES.",
+                        __METHOD__ . " Error received from VIES",
                         [
                             'errors' => $errors
                         ]
@@ -462,7 +461,7 @@ class TaxScheme  implements TaxSchemeInterface
                     $errors[] = $errorMsg;
                 }
                 $this->logger->error(
-                    "Gw/AutoCustomerGroupEu/Model/TaxScheme::validateOnline() : Error received from VIES.",
+                    __METHOD__ . " Error received from VIES",
                     [
                         'errors' => $errors
                     ]
@@ -473,7 +472,7 @@ class TaxScheme  implements TaxSchemeInterface
             $taxIdCheckResponse->setIsValid(false);
             $taxIdCheckResponse->setRequestMessage(__('A system error has occurred.'));
             $this->logger->critical(
-                "Gw/AutoCustomerGroupEu/Model/TaxScheme::validateOnline() : Exception",
+                __METHOD__ . " Exception",
                 [
                     'message' => $e->getMessage()
                 ]
@@ -610,9 +609,12 @@ class TaxScheme  implements TaxSchemeInterface
                 ->getAnyRate($websiteBaseCurrency);
             if (!$exchangerate) {
                 $this->logger->critical(
-                    "Gw/AutoCustomerGroupEu/Model/TaxScheme::getSchemeExchangeRate() : " .
-                    "No Magento Exchange Rate configured for " . self::SCHEME_CURRENCY . " to " .
-                    $websiteBaseCurrency . ". Using 1.0"
+                    __METHOD__ . " No Exchange Rate configured. Using 1.0",
+                    [
+                        'Scheme Currency' => self::SCHEME_CURRENCY,
+                        'Base Currency' => $websiteBaseCurrency,
+
+                    ]
                 );
                 $exchangerate = 1.0;
             }
